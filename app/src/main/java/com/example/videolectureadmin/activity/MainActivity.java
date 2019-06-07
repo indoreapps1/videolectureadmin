@@ -1,8 +1,13 @@
 package com.example.videolectureadmin.activity;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.support.v4.view.GravityCompat;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -15,6 +20,8 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
 import com.example.videolectureadmin.R;
+import com.example.videolectureadmin.fragments.ChangePassFragment;
+import com.example.videolectureadmin.fragments.HomeFragment;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -40,6 +47,13 @@ public class MainActivity extends AppCompatActivity
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(this);
+        setUpHome();
+    }
+
+    private void setUpHome() {
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
+        HomeFragment homeFragment = HomeFragment.newInstance("", "");
+        moveFragmentno(homeFragment);
     }
 
     @Override
@@ -68,6 +82,12 @@ public class MainActivity extends AppCompatActivity
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            SharedPreferences sharedPreferences = getSharedPreferences("login", MODE_PRIVATE);
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.clear();
+            editor.apply();
+            startActivity(new Intent(MainActivity.this, LoginActivity.class));
+            finish();
             return true;
         }
 
@@ -81,8 +101,11 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_home) {
+          setUpHome();
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        } else if (id == R.id.nav_cpass) {
+            ChangePassFragment changePassFragment = ChangePassFragment.newInstance("", "");
+            moveFragment(changePassFragment);
 
         } else if (id == R.id.nav_slideshow) {
 
@@ -98,4 +121,21 @@ public class MainActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    public void moveFragmentno(Fragment fragment) {
+        FragmentManager fragmentManager = ((FragmentActivity) this).getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+//                .addToBackStack(null)
+                .commit();
+    }
+
+    public void moveFragment(Fragment fragment) {
+        FragmentManager fragmentManager = ((FragmentActivity) this).getSupportFragmentManager();
+        fragmentManager.beginTransaction()
+                .replace(R.id.container, fragment)
+                .addToBackStack(null)
+                .commit();
+    }
+
 }

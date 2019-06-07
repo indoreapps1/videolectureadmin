@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
                 }
             }
         });
+        overridePendingTransition(R.anim.slide_in, R.anim.slide_out);
     }
 
     private void loginData() {
