@@ -7,5 +7,6 @@
     <color name="colorBlack">#090808</color>
     <color name="colorSecondary">#C7C6C6</color>
     <color name="colorYellow">#FCF6C0</color>
+    <color name="colorBg">#FF9800</color>
 
 </resources>
