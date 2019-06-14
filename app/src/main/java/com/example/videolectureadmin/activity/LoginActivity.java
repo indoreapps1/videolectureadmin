@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
                 public void onDone(String workName, boolean isComplete) {
                     if (isComplete) {
                         if (workName.trim().equalsIgnoreCase("no")) {
-                            edt_username.setError("Invalid Information");
+                            edt_username.setError("Invalid Phone or Password");
                             edt_username.requestFocus();
                         } else {
                             ContentData contentData = new Gson().fromJson(workName, ContentData.class);
@@ -79,7 +79,8 @@ public class LoginActivity extends AppCompatActivity {
                             }
                         }
                     } else {
-                        Toasty.error(LoginActivity.this, "Login Error Try Again").show();
+                        edt_username.setError("Invalid Phone or Password");
+                        edt_username.requestFocus();
                     }
                     progressDialog.dismiss();
                 }

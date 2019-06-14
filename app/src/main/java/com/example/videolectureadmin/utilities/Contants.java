@@ -39,7 +39,7 @@ public class Contants {
     public static final String Dont_GetAddress_MESSAGE = "Some Problem For Geting Address";
     public static final String No_DATA_FOUND_MESSAGE = "No Record Found";
     public static final String Login = "login.php";
-    public static final String Signup = "register.php";
+    public static final String updatePass = "updatePass.php";
     public static final String otpverifiy = "otpverifiy.php";
     public static final String withdrawotpverifiy = "withdrawotpverifiy.php";
     public static final String reset = "reset.php";

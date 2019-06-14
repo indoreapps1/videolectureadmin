@@ -54,14 +54,11 @@ public class ServiceCaller {
 
         RequestQueue requestQueue = Volley.newRequestQueue(context);
         requestQueue.add(stringRequest);
-//
-//        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-//        AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
     }
 
-    //    call All signup data
-    public void callSignupService(final String firstName, final String userName, final String email, final String phone, final String password, final String code, final String deviceId, final IAsyncWorkCompletedCallback workCompletedCallback) {
-        final String url = Contants.SERVICE_BASE_URL + Contants.Signup;
+    //    call update Pass data
+    public void callUpdatePassService(final int id, final String password, final IAsyncWorkCompletedCallback workCompletedCallback) {
+        final String url = Contants.SERVICE_BASE_URL + Contants.updatePass;
         StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
             @Override
             public void onResponse(String response) {
@@ -70,38 +67,23 @@ public class ServiceCaller {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-//                error.printStackTrace();
                 workCompletedCallback.onDone(error.getMessage(), false);
             }
         }) {
             @Override
             protected Map<String, String> getParams() throws AuthFailureError {
                 Map<String, String> params = new HashMap<String, String>();
-//                params.put("Content-Type", "application/text; charset=utf-8");
-                params.put("full_name", firstName);
-                params.put("deviceId", deviceId);
-                params.put("user_name", userName);
-                params.put("email", email);
-                params.put("mobile_no", phone);
-                params.put("password", password);
-                params.put("sponsor_code", code);
-                return params;
-            }
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                Map<String, String> params = new HashMap<String, String>();
-                params.put("Content-Type", "application/x-www-form-urlencoded; charset=UTF-16;");
+                params.put("id", String.valueOf(id));
+                params.put("pass", password);
                 return params;
             }
         };
 
-//        RequestQueue requestQueue = Volley.newRequestQueue(context);
-//        requestQueue.add(stringRequest);
-        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
-        stringRequest.setShouldCache(false);
-        AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
+        RequestQueue requestQueue = Volley.newRequestQueue(context);
+        requestQueue.add(stringRequest);
+//
+//        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+//        AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
     }
-
 
 }
