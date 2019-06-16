@@ -8,5 +8,7 @@
     <color name="colorSecondary">#C7C6C6</color>
     <color name="colorYellow">#FCF6C0</color>
     <color name="colorBg">#FF9800</color>
+    <color name="colorRed">#F44336</color>
+    <color name="colorGreen">#009688</color>
 
 </resources>

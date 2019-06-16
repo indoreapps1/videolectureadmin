@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginLeft="@dimen/dim_value_10"
+        android:layout_marginTop="@dimen/dim_value_10"
+        android:gravity="center|left"
+        android:text="Users Rating"
+        android:textColor="@color/colorBlack"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/dim_value_5"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dim_value_40"
+            android:layout_weight=".1"
+            android:gravity="center"
+            android:text="Sno"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dim_value_40"
+            android:layout_weight=".45"
+            android:gravity="center"
+            android:text="Video Title"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="@dimen/dim_value_40"
+            android:layout_weight=".45"
+            android:gravity="center"
+            android:text="Rating/P"
+            android:textColor="@color/colorBlack"
+            android:textSize="14sp" />
+
+
+    </LinearLayout>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recycleView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:overScrollMode="never">
+
+    </android.support.v7.widget.RecyclerView>
+</LinearLayout>

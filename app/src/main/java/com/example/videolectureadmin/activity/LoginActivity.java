@@ -14,6 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.videolectureadmin.R;
 import com.example.videolectureadmin.framework.IAsyncWorkCompletedCallback;
@@ -61,10 +62,14 @@ public class LoginActivity extends AppCompatActivity {
             serviceCaller.callLoginService(username, password, new IAsyncWorkCompletedCallback() {
                 @Override
                 public void onDone(String workName, boolean isComplete) {
+                    Toast.makeText(LoginActivity.this, workName+"", Toast.LENGTH_SHORT).show();
                     if (isComplete) {
                         if (workName.trim().equalsIgnoreCase("no")) {
-                            edt_username.setError("Invalid Phone or Password");
+                            edt_username.setError("Invalid Phone Number");
                             edt_username.requestFocus();
+                        } else if (workName.trim().equalsIgnoreCase("pass")) {
+                            edt_pass.setError("Invalid Password");
+                            edt_pass.requestFocus();
                         } else {
                             ContentData contentData = new Gson().fromJson(workName, ContentData.class);
                             for (Result result : contentData.getResult()) {

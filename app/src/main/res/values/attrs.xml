@@ -14,4 +14,8 @@
         <attr name="border_width_circular" format="dimension" />
         <attr name="border_color_circular" format="color" />
     </declare-styleable>
+
+    <declare-styleable name="ExpandableTextView">
+        <attr name="trimLength" format="integer"/>
+    </declare-styleable>
 </resources>
