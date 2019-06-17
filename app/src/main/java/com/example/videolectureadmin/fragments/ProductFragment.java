@@ -40,7 +40,7 @@ public class ProductFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
 
     // TODO: Rename and change types of parameters
-    private String sub_category_id;
+    private String productId;
     private String mParam2;
 
 
@@ -70,7 +70,7 @@ public class ProductFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
-            sub_category_id = getArguments().getString(ARG_PARAM1);
+            productId = getArguments().getString(ARG_PARAM1);
             mParam2 = getArguments().getString(ARG_PARAM2);
         }
     }
@@ -90,14 +90,14 @@ public class ProductFragment extends Fragment {
         txt_time = view.findViewById(R.id.txt_time);
         txt_description = view.findViewById(R.id.txt_description);
         getProductData();
-        FloatingActionButton fab = view.findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AddProductFragment addCategoryFragment = AddProductFragment.newInstance("", "");
-                moveFragment(addCategoryFragment);
-            }
-        });
+//        FloatingActionButton fab = view.findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                AddProductFragment addCategoryFragment = AddProductFragment.newInstance("", "");
+//                moveFragment(addCategoryFragment);
+//            }
+//        });
     }
 
     private void getProductData() {
@@ -107,7 +107,7 @@ public class ProductFragment extends Fragment {
             dialog.show();
             ServiceCaller serviceCaller = new ServiceCaller(context);
 //            Toast.makeText(context, ""+sub_category_id, Toast.LENGTH_SHORT).show();
-            serviceCaller.callAllProductData(sub_category_id, new IAsyncWorkCompletedCallback() {
+            serviceCaller.callAllProductData(productId, new IAsyncWorkCompletedCallback() {
                 @Override
                 public void onDone(String workName, boolean isComplete) {
                     dialog.dismiss();

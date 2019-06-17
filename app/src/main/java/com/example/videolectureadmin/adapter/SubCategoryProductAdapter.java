@@ -40,7 +40,7 @@ public class SubCategoryProductAdapter extends RecyclerView.Adapter<SubCategoryP
         myViewHolder.item_card_sub_category.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ProductFragment productFragment= ProductFragment.newInstance(resultList.get(i).getSubcategoryId(),"");
+                ProductFragment productFragment= ProductFragment.newInstance(resultList.get(i).getProductId(),"");
                 moveFragment(productFragment);
             }
         });

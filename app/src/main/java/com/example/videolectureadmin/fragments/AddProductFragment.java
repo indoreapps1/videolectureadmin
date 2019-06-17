@@ -6,8 +6,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -15,20 +15,27 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.example.videolectureadmin.R;
 import com.example.videolectureadmin.framework.IAsyncWorkCompletedCallback;
 import com.example.videolectureadmin.framework.ServiceCaller;
+import com.example.videolectureadmin.model.ContentData;
+import com.example.videolectureadmin.model.Result;
+import com.example.videolectureadmin.utilities.Upload;
+import com.google.gson.Gson;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import es.dmoral.toasty.Toasty;
 import fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard;
@@ -63,13 +70,16 @@ public class AddProductFragment extends Fragment {
     View view;
     Context context;
     Button btn_submit, btn_choose;
-    TextInputEditText edt_catename;
+    TextInputEditText edt_catename, edt_des;
     ImageView imageView;
     JCVideoPlayerStandard video_player;
     private int SELECT_VIDEO = 3;
     //storage permission code
     private static final int STORAGE_PERMISSION_CODE = 123;
     String selectedPath;
+    Spinner spinner;
+    String category;
+    List<String> arrayList;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -90,22 +100,39 @@ public class AddProductFragment extends Fragment {
     }
 
     private void init() {
+        arrayList = new ArrayList<>();
         //Requesting storage permission
         requestStoragePermission();
         video_player = view.findViewById(R.id.video_player);
         btn_submit = view.findViewById(R.id.btn_submit);
         btn_choose = view.findViewById(R.id.btn_choose);
         edt_catename = view.findViewById(R.id.edt_catename);
+        edt_des = view.findViewById(R.id.edt_des);
         imageView = view.findViewById(R.id.imageView);
+        spinner = view.findViewById(R.id.spinner);
+        getCategory();
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 String cname = edt_catename.getText().toString();
+                String des = edt_des.getText().toString();
                 if (cname.length() == 0) {
                     edt_catename.setError("Enter Video Title");
                     edt_catename.requestFocus();
+                } else if (des.length() == 0) {
+                    edt_des.setError("Enter Video Description");
+                    edt_des.requestFocus();
                 } else {
-                    uploadImage();
+                    if (category != null) {
+                        if (selectedPath != null) {
+                            uploadVideo();
+                        } else {
+                            Toasty.error(context, "Please Select Video").show();
+                        }
+                    } else {
+                        Toasty.error(context, "Please Select Category").show();
+
+                    }
                 }
             }
         });
@@ -113,6 +140,43 @@ public class AddProductFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 showFileChooser();
+            }
+        });
+        spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                category = parent.getItemAtPosition(position).toString(); //this is your selected item
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void getCategory() {
+        ServiceCaller serviceCaller = new ServiceCaller(context);
+        serviceCaller.callCategoryData(new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String workName, boolean isComplete) {
+                if (isComplete) {
+                    ContentData myPojo = new Gson().fromJson(workName, ContentData.class);
+                    for (Result result : myPojo.getResult()) {
+                        arrayList.addAll(Arrays.asList(result.getCategoryName()));
+                    }
+                    if (arrayList != null) {
+//                        Toast.makeText(context, ""+arrayList.size(), Toast.LENGTH_SHORT).show();
+                        ArrayAdapter<String> stringArrayAdapter = new ArrayAdapter<>(context, android.R.layout.simple_list_item_1, arrayList);
+                        spinner.setAdapter(stringArrayAdapter);
+                    } else {
+                        Toasty.error(context, "Any Category Not Found", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    Toasty.error(context, "Something went wrong", Toast.LENGTH_SHORT).show();
+
+                }
+
             }
         });
     }
@@ -133,7 +197,7 @@ public class AddProductFragment extends Fragment {
                 Uri selectedImageUri = data.getData();
                 selectedPath = getPath(selectedImageUri);
                 video_player.setUp(selectedPath, video_player.SCREEN_LAYOUT_NORMAL);
-                video_player.startVideo();
+//                video_player.startVideo();
             }
         }
     }
@@ -188,27 +252,52 @@ public class AddProductFragment extends Fragment {
         }
     }
 
+    private void uploadVideo() {
+        class UploadVideo extends AsyncTask<Void, Void, String> {
 
-    private void uploadImage() {
-        if (selectedPath != null) {
-//            String uploadImage = getStringImage(bitmap);
-            final ProgressDialog progressDialog = new ProgressDialog(context);
-            progressDialog.setMessage("Adding Wait");
-            progressDialog.setCancelable(false);
-            progressDialog.show();
-            ServiceCaller serviceCaller = new ServiceCaller(context);
-            serviceCaller.callAddCategoryData(edt_catename.getText().toString(), "", new IAsyncWorkCompletedCallback() {
-                @Override
-                public void onDone(String workName, boolean isComplete) {
-                    if (isComplete) {
-                        Toasty.success(context, "Add new Category Successfully").show();
-                        getFragmentManager().popBackStack();
-                    }
-                    progressDialog.dismiss();
-                }
-            });
-        } else {
-            Toasty.error(context, "Please Select Video").show();
+            ProgressDialog uploading;
+
+            @Override
+            protected void onPreExecute() {
+                super.onPreExecute();
+                uploading = ProgressDialog.show(getActivity(), "Uploading Video", "Please wait...", false, false);
+            }
+
+            @Override
+            protected void onPostExecute(String s) {
+                super.onPostExecute(s);
+                uploading.dismiss();
+                uploadData(s);
+            }
+
+            @Override
+            protected String doInBackground(Void... params) {
+                Upload u = new Upload();
+                String msg = u.uploadVideo(selectedPath);
+                return msg;
+            }
         }
+        UploadVideo uv = new UploadVideo();
+        uv.execute();
+    }
+
+    private void uploadData(String s) {
+//            String uploadImage = getStringImage(bitmap);
+        final ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setMessage("Adding Wait");
+        progressDialog.setCancelable(false);
+        progressDialog.show();
+        ServiceCaller serviceCaller = new ServiceCaller(context);
+        serviceCaller.callAddProductData(category, edt_catename.getText().toString(), edt_des.getText().toString(), s, new IAsyncWorkCompletedCallback() {
+            @Override
+            public void onDone(String workName, boolean isComplete) {
+                if (isComplete) {
+                    Toasty.success(context, "Add Product Successfully").show();
+                    getFragmentManager().popBackStack();
+                }
+                progressDialog.dismiss();
+            }
+        });
+
     }
 }

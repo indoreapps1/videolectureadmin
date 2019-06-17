@@ -42,6 +42,7 @@ public class Contants {
     public static final String updatePass = "updatePass.php";
     public static final String GetCategory = "getCategory.php";
     public static final String uploadCategory = "uploadCategory.php";
+    public static final String uploadProduct = "uploadProduct.php";
     public static final String deleteCategory = "deleteCategory.php";
     public static final String getAllUsers = "getAllUsers.php";
     public static final String getAllRating = "getAllRating.php";

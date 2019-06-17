@@ -3,6 +3,7 @@ package com.example.videolectureadmin.fragments;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -80,6 +81,14 @@ public class MainProductFragment extends Fragment {
 
     private void init() {
         recycleView = view.findViewById(R.id.recycleView);
+        FloatingActionButton fab = view.findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                AddProductFragment addCategoryFragment = AddProductFragment.newInstance("", "");
+                moveFragment(addCategoryFragment);
+            }
+        });
         gtUsersList();
     }
 
