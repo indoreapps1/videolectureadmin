@@ -41,7 +41,7 @@ public class HomeFragment extends Fragment {
 
     View view;
     Context context;
-    CardView card_category,card_usrs,card_qa,card_rating,card_product;
+    CardView card_category,card_usrs,card_qa,card_rating,card_product,pager;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -68,6 +68,7 @@ public class HomeFragment extends Fragment {
         card_qa = view.findViewById(R.id.card_qa);
         card_rating = view.findViewById(R.id.card_rating);
         card_product = view.findViewById(R.id.card_product);
+        pager = view.findViewById(R.id.pager);
         card_category.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -100,6 +101,13 @@ public class HomeFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 MainProductFragment categoryFragment = MainProductFragment.newInstance("", "");
+                moveFragment(categoryFragment);
+            }
+        });
+        pager.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                PagerFragment categoryFragment = PagerFragment.newInstance("", "");
                 moveFragment(categoryFragment);
             }
         });

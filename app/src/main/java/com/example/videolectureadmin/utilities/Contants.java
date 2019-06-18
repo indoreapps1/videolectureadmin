@@ -43,12 +43,15 @@ public class Contants {
     public static final String GetCategory = "getCategory.php";
     public static final String uploadCategory = "uploadCategory.php";
     public static final String uploadProduct = "uploadProduct.php";
+    public static final String uploadPager = "uploadPager.php";
     public static final String deleteCategory = "deleteCategory.php";
+    public static final String deletePager = "deletePager.php";
     public static final String deleteProduct = "deleteProduct.php";
     public static final String getAllUsers = "getAllUsers.php";
     public static final String getAllRating = "getAllRating.php";
     public static final String getQuestionAnsTitle = "getQuestionAnsTitle.php";
     public static final String getQuestionAns = "getQuestionAns.php";
     public static final String GetProductData = "getProductData.php";
+    public static final String getPagerData = "getPagerData.php";
 
 }

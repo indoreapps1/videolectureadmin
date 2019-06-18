@@ -168,6 +168,32 @@ public class ServiceCaller {
         AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
     }
 
+    //    callAddPagerData data
+    public void callAddPagerData(final String video, final IAsyncWorkCompletedCallback workCompletedCallback) {
+        final String url = Contants.SERVICE_BASE_URL + Contants.uploadPager;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                workCompletedCallback.onDone(response, true);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                workCompletedCallback.onDone(error.getMessage(), false);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("video", video);
+                return params;
+            }
+        };
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
+    }
+
     //    callCategoryData data
     public void callUsersData(final IAsyncWorkCompletedCallback workCompletedCallback) {
         final String url = Contants.SERVICE_BASE_URL + Contants.getAllUsers;
@@ -324,6 +350,33 @@ public class ServiceCaller {
         AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
     }
 
+
+    //    callCategoryData data
+    public void callDeletePagerData(final int id, final IAsyncWorkCompletedCallback workCompletedCallback) {
+        final String url = Contants.SERVICE_BASE_URL + Contants.deletePager;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                workCompletedCallback.onDone(response, true);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                workCompletedCallback.onDone(error.getMessage(), false);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                params.put("id", String.valueOf(id));
+                return params;
+            }
+        };
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
+    }
+
     //    callCategoryData data
     public void callDeleteProductData(final String id, final IAsyncWorkCompletedCallback workCompletedCallback) {
         final String url = Contants.SERVICE_BASE_URL + Contants.deleteProduct;
@@ -350,4 +403,28 @@ public class ServiceCaller {
         AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
     }
 
+    //    callCategoryData data
+    public void callPagerData(final IAsyncWorkCompletedCallback workCompletedCallback) {
+        final String url = Contants.SERVICE_BASE_URL + Contants.getPagerData;
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                workCompletedCallback.onDone(response, true);
+            }
+        }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                workCompletedCallback.onDone(error.getMessage(), false);
+            }
+        }) {
+            @Override
+            protected Map<String, String> getParams() throws AuthFailureError {
+                Map<String, String> params = new HashMap<String, String>();
+                return params;
+            }
+        };
+
+        stringRequest.setRetryPolicy(new DefaultRetryPolicy(20000, 0, DefaultRetryPolicy.DEFAULT_BACKOFF_MULT));
+        AppController.getInstance().addToRequestQueue(stringRequest);//, tag_json_obj);
+    }
 }
