@@ -3,18 +3,23 @@ package com.example.videolectureadmin.adapter;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.RecyclerView;
+import android.util.Base64;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.example.videolectureadmin.R;
 import com.example.videolectureadmin.fragments.CategoryFragment;
 import com.example.videolectureadmin.fragments.PagerFragment;
@@ -46,7 +51,13 @@ public class PagerAdapter extends RecyclerView.Adapter<PagerAdapter.MYViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PagerAdapter.MYViewHolder myViewHolder, final int i) {
-        myViewHolder.video_player.setUp(resultList.get(i).getVideo(), myViewHolder.video_player.SCREEN_LAYOUT_NORMAL);
+        byte[] decodedString = Base64.decode(resultList.get(i).getVideo(), Base64.DEFAULT);
+        Bitmap decodedByte = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.length);
+        if (resultList.get(i).getVideo().equalsIgnoreCase("")) {
+            Glide.with(context).load(R.drawable.userprofile).into(myViewHolder.item_category_img);
+        } else {
+            Glide.with(context).load(decodedByte).into(myViewHolder.item_category_img);
+        }
         myViewHolder.tv_delete.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -112,12 +123,12 @@ public class PagerAdapter extends RecyclerView.Adapter<PagerAdapter.MYViewHolder
     }
 
     public class MYViewHolder extends RecyclerView.ViewHolder {
-        JCVideoPlayerStandard video_player;
+        ImageView item_category_img;
         TextView tv_delete;
 
         public MYViewHolder(@NonNull View itemView) {
             super(itemView);
-            video_player = itemView.findViewById(R.id.video_player);
+            item_category_img = itemView.findViewById(R.id.item_category_img);
             tv_delete = itemView.findViewById(R.id.tv_delete);
         }
     }

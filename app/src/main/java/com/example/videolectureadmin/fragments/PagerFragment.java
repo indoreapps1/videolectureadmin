@@ -100,11 +100,6 @@ public class PagerFragment extends Fragment {
                 .commit();
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        JCVideoPlayer.releaseAllVideos();
-    }
 
     private void getPagerData() {
         ServiceCaller serviceCaller = new ServiceCaller(context);

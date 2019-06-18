@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -14,6 +15,7 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -32,6 +34,7 @@ import com.example.videolectureadmin.model.ContentData;
 import com.example.videolectureadmin.model.Result;
 import com.google.gson.Gson;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -79,9 +82,11 @@ public class AddPagerFragment extends Fragment {
     Context context;
     Button btn_submit, btn_choose;
     JCVideoPlayerStandard video_player;
-    private int SELECT_VIDEO = 3;
+    private Bitmap bitmap;
+    private int PICK_IMAGE_REQUEST = 1;
     private static final int STORAGE_PERMISSION_CODE = 123;
-    String selectedPath;
+    private Uri filePath;
+    ImageView imageView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -106,25 +111,11 @@ public class AddPagerFragment extends Fragment {
         video_player = view.findViewById(R.id.video_player);
         btn_submit = view.findViewById(R.id.btn_submit);
         btn_choose = view.findViewById(R.id.btn_choose);
+        imageView = view.findViewById(R.id.imageView);
         btn_submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (selectedPath != null) {
-                    dialog = new ProgressDialog(context);
-                    dialog.setCancelable(false);
-                    dialog.setMessage("Uploading Video...");
-                    dialog.show();
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            //creating new thread to handle Http Operations
-                            uploadFile(selectedPath, dialog);
-                        }
-                    }).start();
-//                            uploadFile(selectedPath);
-                } else {
-                    Toasty.error(context, "Please Select Video").show();
-                }
+                uploadImage();
             }
         });
         btn_choose.setOnClickListener(new View.OnClickListener() {
@@ -138,45 +129,27 @@ public class AddPagerFragment extends Fragment {
     //method to show file chooser
     private void showFileChooser() {
         Intent intent = new Intent();
-        intent.setType("video/*");
+        intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(Intent.createChooser(intent, "Select a Video "), SELECT_VIDEO);
+        startActivityForResult(Intent.createChooser(intent, "Select Picture"), PICK_IMAGE_REQUEST);
     }
 
+    //handling the image chooser activity result
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (resultCode == RESULT_OK) {
-            if (requestCode == SELECT_VIDEO) {
-                System.out.println("SELECT_VIDEO");
-                Uri selectedImageUri = data.getData();
-                selectedPath = getPath(selectedImageUri);
-                video_player.setUp(selectedPath, video_player.SCREEN_LAYOUT_NORMAL);
-//                video_player.startVideo();
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK && data != null && data.getData() != null) {
+            filePath = data.getData();
+            try {
+                bitmap = MediaStore.Images.Media.getBitmap(context.getContentResolver(), filePath);
+                imageView.setImageBitmap(bitmap);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }
-    @Override
-    public void onPause() {
-        super.onPause();
-        JCVideoPlayer.releaseAllVideos();
-    }
 
-    public String getPath(Uri uri) {
-        Cursor cursor = context.getContentResolver().query(uri, null, null, null, null);
-        cursor.moveToFirst();
-        String document_id = cursor.getString(0);
-        document_id = document_id.substring(document_id.lastIndexOf(":") + 1);
-        cursor.close();
-
-        cursor = context.getContentResolver().query(
-                MediaStore.Video.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-        cursor.moveToFirst();
-        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));
-        cursor.close();
-
-        return path;
-    }
 
     //Requesting permission
     private void requestStoragePermission() {
@@ -211,152 +184,34 @@ public class AddPagerFragment extends Fragment {
         }
     }
 
-    public static final String UPLOAD_URL = "https://loopfusion.in/videolecture/adminApi/uploadVideo.php";
-    ProgressDialog dialog;
-
-    public int uploadFile(final String selectedFilePath, final ProgressDialog dialog) {
-
-        int serverResponseCode = 0;
-
-        HttpURLConnection connection;
-        DataOutputStream dataOutputStream;
-        String lineEnd = "\r\n";
-        String twoHyphens = "--";
-        String boundary = "*****";
-
-
-        int bytesRead, bytesAvailable, bufferSize;
-        byte[] buffer;
-        int maxBufferSize = 1 * 1024 * 1024;
-        File selectedFile = new File(selectedFilePath);
-
-
-        String[] parts = selectedFilePath.split("/");
-        final String fileName = parts[parts.length - 1];
-
-        if (!selectedFile.isFile()) {
-            dialog.dismiss();
-
-            getActivity().runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-//                    tvFileName.setText("Source File Doesn't Exist: " + selectedFilePath);
-                }
-            });
-            return 0;
-        } else {
-            try {
-                FileInputStream fileInputStream = new FileInputStream(selectedFile);
-                URL url = new URL(UPLOAD_URL);
-                connection = (HttpURLConnection) url.openConnection();
-                connection.setDoInput(true);//Allow Inputs
-                connection.setDoOutput(true);//Allow Outputs
-                connection.setUseCaches(false);//Don't use a cached Copy
-                connection.setRequestMethod("POST");
-                connection.setRequestProperty("Connection", "Keep-Alive");
-                connection.setRequestProperty("ENCTYPE", "multipart/form-data");
-                connection.setRequestProperty("Content-Type", "multipart/form-data;boundary=" + boundary);
-                connection.setRequestProperty("uploaded_file", selectedFilePath);
-
-                //creating new dataoutputstream
-                dataOutputStream = new DataOutputStream(connection.getOutputStream());
-
-                //writing bytes to data outputstream
-                dataOutputStream.writeBytes(twoHyphens + boundary + lineEnd);
-                dataOutputStream.writeBytes("Content-Disposition: form-data; name=\"uploaded_file\";filename=\""
-                        + selectedFilePath + "\"" + lineEnd);
-
-                dataOutputStream.writeBytes(lineEnd);
-
-                //returns no. of bytes present in fileInputStream
-                bytesAvailable = fileInputStream.available();
-                //selecting the buffer size as minimum of available bytes or 1 MB
-                bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                //setting the buffer as byte array of size of bufferSize
-                buffer = new byte[bufferSize];
-
-                //reads bytes from FileInputStream(from 0th index of buffer to buffersize)
-                bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-
-                //loop repeats till bytesRead = -1, i.e., no bytes are left to read
-                while (bytesRead > 0) {
-                    //write the bytes read from inputstream
-                    dataOutputStream.write(buffer, 0, bufferSize);
-                    bytesAvailable = fileInputStream.available();
-                    bufferSize = Math.min(bytesAvailable, maxBufferSize);
-                    bytesRead = fileInputStream.read(buffer, 0, bufferSize);
-                }
-
-                dataOutputStream.writeBytes(lineEnd);
-                dataOutputStream.writeBytes(twoHyphens + boundary + twoHyphens + lineEnd);
-
-                serverResponseCode = connection.getResponseCode();
-                String serverResponseMessage = connection.getResponseMessage();
-//                Toasty.error(getActivity(), serverResponseMessage).show();
-                Log.i("tg", "Server Response is: " + serverResponseMessage + ": " + serverResponseCode);
-
-                //response code of 200 indicates the server status OK
-                if (serverResponseCode == 200) {
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            if (dialog.isShowing()) {
-                                dialog.dismiss();
-                            }
-                            String url = "https://loopfusion.in/videolecture/adminApi/videos/" + fileName;
-                            uploadData(url);
-//                            tvFileName.setText("File Upload completed.\n\n You can see the uploaded file here: \n\n" + "http://coderefer.com/extras/uploads/"+ fileName);
-                        }
-                    });
-                }
-
-                //closing the input and output streams
-                fileInputStream.close();
-                dataOutputStream.flush();
-                dataOutputStream.close();
-                if (dialog.isShowing()) {
-                    dialog.dismiss();
-                }
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-                getActivity().runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-//                        Toast.makeText(MainActivity.this,"File Not Found",Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-//                Toast.makeText(MainActivity.this, "URL error!", Toast.LENGTH_SHORT).show();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-//                Toast.makeText(MainActivity.this, "Cannot Read/Write File!", Toast.LENGTH_SHORT).show();
-            }
-            dialog.dismiss();
-            return serverResponseCode;
-        }
-
+    public String getStringImage(Bitmap bmp) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.JPEG, 100, baos);
+        byte[] imageBytes = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageBytes, Base64.DEFAULT);
+        return encodedImage;
     }
 
-    private void uploadData(String s) {
-//            String uploadImage = getStringImage(bitmap);
-        final ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("Adding Wait");
-        progressDialog.setCancelable(false);
-        progressDialog.show();
-        ServiceCaller serviceCaller = new ServiceCaller(context);
-        serviceCaller.callAddPagerData(s, new IAsyncWorkCompletedCallback() {
-            @Override
-            public void onDone(String workName, boolean isComplete) {
-                if (isComplete) {
-                    Toasty.success(context, "Add Pager Video Successfully").show();
-                    getFragmentManager().popBackStack();
+    private void uploadImage() {
+        if (bitmap != null) {
+            String uploadImage = getStringImage(bitmap);
+            final ProgressDialog progressDialog = new ProgressDialog(context);
+            progressDialog.setMessage("Adding Wait");
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+            ServiceCaller serviceCaller = new ServiceCaller(context);
+            serviceCaller.callAddPagerData(uploadImage, new IAsyncWorkCompletedCallback() {
+                @Override
+                public void onDone(String workName, boolean isComplete) {
+                    if (isComplete) {
+                        Toasty.success(context, "Upload  Successfully").show();
+                        getFragmentManager().popBackStack();
+                    }
+                    progressDialog.dismiss();
                 }
-                progressDialog.dismiss();
-            }
-        });
-
+            });
+        } else {
+            Toasty.error(context, "Please Select Image").show();
+        }
     }
 }

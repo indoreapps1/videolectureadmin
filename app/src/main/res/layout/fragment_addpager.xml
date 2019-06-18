@@ -14,18 +14,19 @@
         android:layout_marginLeft="@dimen/dim_value_10"
         android:layout_marginTop="@dimen/dim_value_10"
         android:gravity="center|left"
-        android:text=" Add / Update Pager Video"
+        android:text=" Add / Update Pager Image"
         android:textColor="@color/colorWhite"
         android:textSize="16sp"
         android:textStyle="bold" />
 
-    <fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard
-        android:id="@+id/video_player"
+    <ImageView
+        android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="180dp"
-        android:layout_margin="@dimen/dim_value_10">
+        android:layout_margin="@dimen/dim_value_10"
+        android:src="@mipmap/launcher">
 
-    </fm.jiecao.jcvideoplayer_lib.JCVideoPlayerStandard>
+    </ImageView>
 
 
     <Button
@@ -36,7 +37,7 @@
         android:backgroundTint="@color/colorBg"
         android:drawableLeft="@drawable/ic_attachment_black_24dp"
         android:drawablePadding="@dimen/dim_value_10"
-        android:text="Choose Pager Video"
+        android:text="Choose Pager Image"
         android:textColor="@color/colorWhite"
         android:textSize="12sp"
         android:textStyle="bold" />
