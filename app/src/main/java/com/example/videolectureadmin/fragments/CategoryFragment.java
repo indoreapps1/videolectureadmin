@@ -104,27 +104,31 @@ public class CategoryFragment extends Fragment {
                 public void onDone(String workName, boolean isComplete) {
                     dialog.dismiss();
                     if (isComplete) {
-                        ContentData myPojo = new Gson().fromJson(workName, ContentData.class);
-                        for (Result result : myPojo.getResult()) {
-                            arrayList.addAll(Arrays.asList(result));
-                        }
-                        if (arrayList != null) {
-                            CategoryAdapter categoryAdapter = new CategoryAdapter(context, arrayList);
-                            category_recycle.setLayoutManager(new GridLayoutManager(context, 2));
-                            category_recycle.setAdapter(categoryAdapter);
-                        } else {
+                        if (workName.trim().equalsIgnoreCase("no")) {
                             Toasty.error(context, "Any Category Not Found", Toast.LENGTH_SHORT).show();
+                        } else {
+                            ContentData myPojo = new Gson().fromJson(workName, ContentData.class);
+                            for (Result result : myPojo.getResult()) {
+                                arrayList.addAll(Arrays.asList(result));
+                            }
+                            if (arrayList != null) {
+                                CategoryAdapter categoryAdapter = new CategoryAdapter(context, arrayList);
+                                category_recycle.setLayoutManager(new GridLayoutManager(context, 2));
+                                category_recycle.setAdapter(categoryAdapter);
+                            } else {
+                                Toasty.error(context, "Any Category Not Found", Toast.LENGTH_SHORT).show();
+                            }
                         }
                     } else {
                         Toasty.error(context, "Something went wrong", Toast.LENGTH_SHORT).show();
 
                     }
-
                 }
             });
         } else {
             Toasty.info(context, "Please check your internet connection", Toast.LENGTH_SHORT).show();
         }
+
     }
 
     public void moveFragment(Fragment fragment) {

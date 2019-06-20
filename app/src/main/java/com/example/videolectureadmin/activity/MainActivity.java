@@ -20,6 +20,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 
 import com.example.videolectureadmin.R;
+import com.example.videolectureadmin.database.DbHelper;
 import com.example.videolectureadmin.fragments.ChangePassFragment;
 import com.example.videolectureadmin.fragments.HomeFragment;
 
@@ -86,6 +87,8 @@ public class MainActivity extends AppCompatActivity
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.clear();
             editor.apply();
+            DbHelper dbHelper = new DbHelper(MainActivity.this);
+            dbHelper.deleteAllProductData();
             startActivity(new Intent(MainActivity.this, LoginActivity.class));
             finish();
             return true;
