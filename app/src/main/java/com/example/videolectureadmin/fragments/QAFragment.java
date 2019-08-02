@@ -84,7 +84,7 @@ public class QAFragment extends Fragment {
         gtUsersList();
     }
 
-    private void gtUsersList() {
+    public void gtUsersList() {
         arrayList = new ArrayList<>();
         if (Utility.isOnline(context)) {
             final ProgressDialog dialog = new ProgressDialog(context);
@@ -92,7 +92,7 @@ public class QAFragment extends Fragment {
             dialog.show();
             dialog.setCancelable(false);
             ServiceCaller serviceCaller = new ServiceCaller(context);
-            serviceCaller.callAllQusAnsData(productId,new IAsyncWorkCompletedCallback() {
+            serviceCaller.callAllQusAnsData(productId, new IAsyncWorkCompletedCallback() {
                 @Override
                 public void onDone(String workName, boolean isComplete) {
                     dialog.dismiss();
@@ -135,10 +135,11 @@ public class QAFragment extends Fragment {
             }
         }
         Collections.reverse(newList);
-        QueAnsAdapter categoryAdapter = new QueAnsAdapter(context, newList);
+        QueAnsAdapter categoryAdapter = new QueAnsAdapter(context, newList, QAFragment.this);
         recycleView.setLayoutManager(new LinearLayoutManager(context));
         recycleView.setAdapter(categoryAdapter);
     }
+
     private boolean categoryDataExist(List<Result> newList, String name) {
         for (Result c : newList) {
             if (c.getQuestion().equalsIgnoreCase(name)) {
@@ -147,6 +148,7 @@ public class QAFragment extends Fragment {
         }
         return false;
     }
+
     public void moveFragment(Fragment fragment) {
         FragmentManager fragmentManager = ((FragmentActivity) context).getSupportFragmentManager();
         fragmentManager.beginTransaction()

@@ -53,5 +53,7 @@ public class Contants {
     public static final String getQuestionAns = "getQuestionAns.php";
     public static final String GetProductData = "getProductData.php";
     public static final String getPagerData = "getPagerData.php";
+    public static final String UploadQuesAns = "uploadAnsByAdmin.php";
+
 
 }

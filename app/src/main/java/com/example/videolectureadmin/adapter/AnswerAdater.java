@@ -32,7 +32,7 @@ public class AnswerAdater extends RecyclerView.Adapter<AnswerAdater.MYViewHolder
     @Override
     public void onBindViewHolder(@NonNull AnswerAdater.MYViewHolder myViewHolder, int i) {
         if (resultList.get(i).getAnswer() != null && !resultList.get(i).getAnswer().equalsIgnoreCase("")) {
-            myViewHolder.item_txt_ans.setText("A." + (i+1) + " " + resultList.get(i).getAnswer());
+            myViewHolder.item_txt_ans.setText("A." + (i) + " " + resultList.get(i).getAnswer());
             myViewHolder.item_txt_ans_time.setText(resultList.get(i).getTime());
         } else {
             myViewHolder.item_txt_ans.setVisibility(View.GONE);
